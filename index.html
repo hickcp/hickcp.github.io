@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <title>Dados do Sensor</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <style>
+    body {
+      background-color: #e7e7e7;
+    }
+
+    .card {
+      background-color: #f7f7f7;
+      border-radius: 10px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+      padding: 30px;
+      text-align: center;
+    }
+
+    h2 {
+      color: #556b2f;
+    }
+
+    p {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+
+    .regar {
+      color: green;
+    }
+
+    .nao-regar {
+      color: brown;
+    }
+
+    .container.mt {
+      margin-top: 20px;
+    }
+
+    .btn-navigation {
+      background-color: #8f9779;
+      border: none;
+      border-radius: 5px;
+      color: #fff;
+      font-size: 18px;
+      font-weight: bold;
+      padding: 10px 20px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      margin-top: 20px;
+    }
+
+    .btn-navigation:hover {
+      background-color: #556b2f;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container mt">
+    <div class="row">
+      <div class="col-md-8 col-md-offset-2">
+        <div class="card">
+          <div>
+            <h1>Projeto Integrador</h1>
+          </div>
+          <h2>Dados do Sensor</h2>
+          <p><strong>Data e Hora:</strong> <span id="date_hour">25/04/2023 15:30</span></p>
+          <p><strong>Umidade:</strong> <span id="umidade">60</span>%</p>
+          <p><strong>Luz:</strong> <span id="luz_solar">500</span> lux</p>
+          <p><strong>Temperatura:</strong> <span id="temperatura">25</span>°C</p>
+          <p><strong>Regar:</strong> <span id="regar" class="regar">Sim</span></p>
+          <button class="btn-navigation"
+            title="Obter informações detalhadas sobre as condições climáticas atuais na região."
+            onclick="window.location.href='current-weather.html'">
+            Clima Atual
+          </button>
+
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    fillPage({
+      luz_solar: 0,
+      umidade: 0,
+      temperatura: 0,
+      regar: regar
+    });
+
+    getPlantaStatus();
+
+    setInterval(function () {
+      getPlantaStatus();
+    }, 5000);
+
+    function fillPage(planta) {
+      const date_hour = document.getElementById('date_hour');
+      const umidade = document.getElementById('umidade');
+      const luz_solar = document.getElementById('luz_solar');
+      const temperatura = document.getElementById('temperatura');
+      const regar = document.getElementById('regar');
+
+      date_hour.innerText = getBRLDateTimeNow();
+      umidade.innerText = planta.umidade;
+      luz_solar.innerText = planta.luz_solar;
+      temperatura.innerText = planta.temperatura;
+
+      if (planta.regar) {
+        regar.innerText = "Sim";
+        regar.classList.add('regar');
+      } else {
+        regar.innerText = "Não";
+        regar.classList.remove('regar');
+      }
+    }
+
+    function getPlantaStatus() {
+      fetch('https://prod-planta.herokuapp.com/informacoes/1?limite=1', {
+        method: 'GET'
+      })
+        .then(response => response.json())
+        .then(data => {
+          const { id_planta, informacoes } = data;
+
+          if (informacoes && informacoes.length) {
+            fillPage(informacoes[0]);
+          }
+        })
+        .catch(error => {
+          console.error('Ocorreu um erro:', error);
+        });
+    }
+
+    function getBRLDateTimeNow() {
+      // Obtém a data e hora atual
+      const dataHoraAtual = new Date();
+
+      // Obtém os componentes da data e hora
+      const dia = String(dataHoraAtual.getDate()).padStart(2, '0');
+      const mes = String(dataHoraAtual.getMonth() + 1).padStart(2, '0'); // Mês começa em 0
+      const ano = dataHoraAtual.getFullYear();
+      const hora = String(dataHoraAtual.getHours()).padStart(2, '0');
+      const minutos = String(dataHoraAtual.getMinutes()).padStart(2, '0');
+
+      // Cria a string no formato desejado
+      const dataHoraFormatada = `${dia}/${mes}/${ano} ${hora}:${minutos}`;
+
+      return dataHoraFormatada;
+    }
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <title>Clima e Temperatura</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <style>
+    body {
+      background-color: #e7e7e7;
+    }
+
+    .card {
+      background-color: #f7f7f7;
+      border-radius: 10px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+      padding: 30px;
+      text-align: center;
+    }
+
+    h2 {
+      color: #556b2f;
+    }
+
+    p {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+
+    .weather-icon {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto;
+      display: block;
+    }
+
+    .temp {
+      font-size: 64px;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+
+    .description {
+      font-size: 24px;
+      margin-top: 10px;
+      margin-bottom: 30px;
+    }
+
+    .maxTemp {
+      font-size: 18px;
+    }
+
+    .minTemp {
+      font-size: 18px;
+    }
+
+    .container.mt {
+      margin-top: 20px;
+    }
+
+    .btn-navigation {
+      background-color: #8f9779;
+      border: none;
+      border-radius: 5px;
+      color: #fff;
+      font-size: 18px;
+      font-weight: bold;
+      padding: 10px 20px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      margin-top: 20px;
+    }
+
+    .btn-navigation:hover {
+      background-color: #556b2f;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container mt">
+    <div class="row">
+      <div class="col-md-8 col-md-offset-2">
+        <div class="card">
+          <h1>Clima e Temperatura</h1>
+          <h2>Votorantim, SP - BR</h2>
+          <p id="date"></p>
+          <img id="weather-icon" class="weather-icon" src="" alt="">
+          <div class="row">
+            <div class="col-md-4 col-md-offset-4">
+              <p id="temp"></p>
+              <p id="description"></p>
+              <p id="maxTemp"></p>
+              <p id="minTemp"></p>
+              <button class="btn-navigation"
+                title="Obter informações detalhadas sobre as condições climáticas atuais na região."
+                onclick="window.location.href='index.html'">
+                Monitoramento
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const weather = {
+      image: "./assets/storage/images/sun.png",
+      temp: 0,
+      description: "Céu limpo",
+      maxTemp: 0,
+      minTemp: 0
+    };
+
+    fillPage(weather);
+
+    getDataFromOpenWeatherAPI();
+
+    function fillPage(weather) {
+      const weatherIcon = document.getElementById('weather-icon');
+      const temp = document.getElementById('temp');
+      const description = document.getElementById('description');
+      const maxTemp = document.getElementById('maxTemp');
+      const minTemp = document.getElementById('minTemp');
+      const date = document.getElementById('date');
+
+      weatherIcon.src = weather.image;
+      temp.innerText = `${Math.round(weather.temp)}°C`;
+      description.innerText = `${weather?.description?.replace(/^\w/, (letra) => letra.toUpperCase())}`;
+      maxTemp.innerHTML = `<strong>Máx:</strong> ${Math.round(weather.maxTemp)}°C`;
+      minTemp.innerHTML = `<strong>Min:</strong> ${Math.round(weather.minTemp)}°C`;
+      date.innerText = getBRLFullDateTimeNow();
+    }
+
+    function getDataFromOpenWeatherAPI() {
+      const apiKey = 'cea9166f2984ea8265e3a1764ec0ba82';
+      const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=Votorantim,br&units=metric&lang=pt&appid=${apiKey}`;
+
+      fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+          const weather = {
+            image: `https://openweathermap.org/img/wn/${data.weather[0].icon}.png`,
+            temp: data.main.temp,
+            description: data?.weather[0]?.description,
+            maxTemp: data.main.temp_max,
+            minTemp: data.main.temp_min
+          };
+
+          fillPage(weather);
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    }
+
+    function getBRLFullDateTimeNow() {
+      const options = { year: 'numeric', month: 'long', day: 'numeric' };
+      const formattedDate = new Date().toLocaleString("pt-BR", options);
+
+      return formattedDate;
+    }
+  </script>
+</body>
+
+</html>
