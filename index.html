@@ -109,7 +109,7 @@
       const regar = document.getElementById('regar');
 
       date_hour.innerText = getBRLDateTimeNow();
-      umidade.innerText = planta.umidade;
+      umidade.innerText = calculateHumidityPercentage(planta.umidade); // Converte o valor em porcentagem
       luz_solar.innerText = planta.luz_solar;
       temperatura.innerText = planta.temperatura;
 
@@ -120,6 +120,15 @@
         regar.innerText = "Não";
         regar.classList.remove('regar');
       }
+    }
+
+    function calculateHumidityPercentage(valorSensorA) {
+      const valorMinimo = 0; // Valor mínimo possível do nível de umidade
+      const valorMaximo = 4095; // Valor máximo possível do nível de umidade
+
+      const umidadePercent = ((valorMaximo - valorSensorA) / (valorMaximo - valorMinimo)) * 100.0;
+
+      return umidadePercent.toFixed(2) + '%'; // Retorna o valor formatado com duas casas decimais e o símbolo de porcentagem
     }
 
     function getPlantaStatus() {
